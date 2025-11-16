@@ -2,7 +2,21 @@ const User = require('../models/User');
 
 const authenticateGoogle = async (req, res, next) => {
   try {
-    // For Swagger/testing - accept any token and create mock user
+    // For GET requests (analytics queries), create a mock user automatically
+    if (req.method === 'GET') {
+      console.log('🔐 GET request - using automatic mock authentication');
+      
+      const mockUser = {
+        _id: 'analytics_query_user',
+        email: 'analytics@query.com',
+        name: 'Analytics Query User'
+      };
+      
+      req.user = mockUser;
+      return next();
+    }
+
+    // For POST requests (registration), check for token but be lenient
     const { token } = req.body;
 
     if (!token) {
